@@ -35,7 +35,7 @@ python train.py --model lcf_bert --dataset laptop --SRD 3 --local_context_focus 
 
 Generally, the best performance needs several independent training processes.
 
-The state-of-the-art benchmarks of the ABSA task can be found at [NLP-progress](https://nlpprogress.com) (See Section of SemEval-2014 subtask2)
+The state-of-the-art benchmarks of the ABSA task can be found at [NLP-progress](https://nlpprogress.com) (See Section of SemEval-2014 subtask4)
 
 ## Notice
 
