@@ -1,5 +1,5 @@
 # LCF-ABSA
-Note that this repository has been mearge into [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch)
+Note that this repository has been merged into [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch)
 
 > Pytorch Implementations.
 
