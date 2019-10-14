@@ -181,8 +181,8 @@ def single_train(model, dataset, local_context_focus, SRD):
     parser.add_argument('--dataset', default=dataset, type=str, help='twitter, restaurant, laptop')
     parser.add_argument('--optimizer', default='adam', type=str)
     parser.add_argument('--initializer', default='xavier_uniform_', type=str)
-    parser.add_argument('--learning_rate', default=0.001, type=float)
-    parser.add_argument('--dropout', default=0, type=float)
+    parser.add_argument('--learning_rate', default=2e-5, type=float)
+    parser.add_argument('--dropout', default=0.1, type=float)
     parser.add_argument('--l2reg', default=0.00001, type=float)
     parser.add_argument('--num_epoch', default=5, type=int)
     parser.add_argument('--batch_size', default=16, type=int)
@@ -279,8 +279,8 @@ def multi_train(model, dataset, SRD, local_context_focus, n):
             print(i + 1, " test_acc_overall: ", round(scores[i][0], 2), "    f1_overall: ", round(scores[i][1], 2))
         mean_test_acc_overall = temp_test_acc_overall / (t + 1)
         mean_f1_overall = temp_f1_overall / (t + 1)
-        print('\n\n\nmax_acc_overall:', round(max_acc_overall, 2), 'f1_overall:', round(max_f1_overall, 2), '\n')
-        print("mean_acc_overall:", round(mean_test_acc_overall, 2), "mean_f1_overall:", round(mean_f1_overall, 2), "\n\n\n")
+        print('max_acc_overall:', round(max_acc_overall, 2), 'f1_overall:', round(max_f1_overall, 2))
+        print("mean_acc_overall:", round(mean_test_acc_overall, 2), "mean_f1_overall:", round(mean_f1_overall, 2))
 
     return mean_test_acc_overall, mean_f1_overall
 
