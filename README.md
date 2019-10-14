@@ -1,5 +1,5 @@
 # LCF-ABSA
-Note that this repository has been merged into [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch)
+This repository also can be found at [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch)
 
 > Pytorch Implementations.
 
@@ -29,10 +29,10 @@ python train.py --model lcf_bert --dataset laptop --SRD 3 --local_context_focus 
 
 | Models           | Restaurant (acc) | Laptop (acc) |  Twitter(acc) 
 | ------------- | :-----:| :-----:| --- | 
-| LCF-Glove-CDM | 82.50 | 76.02 | 72.25
-| LCF-Glove-CDW | 81.61 | 75.24 | 71.82
-| LCF-BERT-CDM | 86.52 | 82.29 | 76.45
-| LCF-BERT-CDW | 87.14 | 82.45 | 77.31
+| LCF-Glove-CDM | 82.50 | 76.02 | 72.25| 
+| LCF-Glove-CDW | 81.61 | 75.24 | 71.82| 
+| LCF-BERT-CDM | 86.52 | 82.29 | 76.45| 
+| LCF-BERT-CDW | 87.14 | 82.45 | 77.31| 
 
 Generally, the best performance needs several independent training processes.
 
@@ -45,3 +45,15 @@ This repository is the raw code for [LCF: A Local Context Focused Aspect-based S
 ## Acknowlegement
 
 Our work is based on the repositories [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch) and the pytorch-pretrained-bert. Thanks to the authors for their devotion and Thanks to all the scholars who offered assistance.
+
+If this repository is helpful to you, please cite our paper as follows:
+@article{zeng2019lcf,
+  title={LCF: A Local Context Focus Mechanism for Aspect-Based Sentiment Classification},
+  author={Zeng, Biqing and Yang, Heng and Xu, Ruyang and Zhou, Wu and Han, Xuli},
+  journal={Applied Sciences},
+  volume={9},
+  number={16},
+  pages={3389},
+  year={2019},
+  publisher={Multidisciplinary Digital Publishing Institute}
+}
