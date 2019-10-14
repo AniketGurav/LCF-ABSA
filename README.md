@@ -46,6 +46,7 @@ This repository is the raw code for [LCF: A Local Context Focused Aspect-based S
 
 Our work is based on the repositories [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch) and the pytorch-pretrained-bert. Thanks to the authors for their devotion and Thanks to all the scholars who offered assistance.
 
+## Citation
 If this repository is helpful to you, please cite our paper as follows:
 @article{zeng2019lcf,
   title={LCF: A Local Context Focus Mechanism for Aspect-Based Sentiment Classification},
