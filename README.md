@@ -48,7 +48,8 @@ Our work is based on the repositories [ABSA-PyTorch](https://github.com/songyouw
 
 ## Citation
 If this repository is helpful to you, please cite our paper as follows:
-@article{zeng2019lcf,
+
+    @article{zeng2019lcf,
     title={LCF: A Local Context Focus Mechanism for Aspect-Based Sentiment Classification},
     author={Zeng, Biqing and Yang, Heng and Xu, Ruyang and Zhou, Wu and Han, Xuli},
     journal={Applied Sciences},
@@ -57,4 +58,4 @@ If this repository is helpful to you, please cite our paper as follows:
     pages={3389},
     year={2019},
     publisher={Multidisciplinary Digital Publishing Institute}
-}
+    }
