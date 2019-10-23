@@ -17,7 +17,7 @@ import os
 
 from data_utils import build_tokenizer, build_embedding_matrix, Tokenizer4Bert, ABSADataset
 
-from models import LCF_BERT, LCF_GLOVE
+from models import LCF_BERT
 from models.bert_spc import BERT_SPC
 
 
@@ -203,7 +203,6 @@ def single_train(model, dataset, local_context_focus, SRD):
 
     model_classes = {
         'bert_spc': BERT_SPC,
-        'lcf_glove': LCF_GLOVE,
         'lcf_bert': LCF_BERT,
     }
 
@@ -224,7 +223,6 @@ def single_train(model, dataset, local_context_focus, SRD):
 
     input_colses = {
         'bert_spc': ['text_bert_indices', 'bert_segments_ids', 'aspect_indices'],
-        'lcf_glove': ['text_raw_indices', 'text_raw_indices', 'aspect_indices'],
         'lcf_bert': ['text_bert_indices', 'bert_segments_ids', 'text_raw_bert_indices', 'aspect_bert_indices'],
     }
     initializers = {
@@ -290,17 +288,14 @@ if __name__ == '__main__':
     single_train()
 
     # model = 'lcf_bert'
-    # # model = 'lcf_glove'
     # # model = 'bert_spc'
     #
     #
-    # # local_context_focus='cdm'
+    # local_context_focus = 'cdm'
     # local_context_focus='cdw'
     #
     # # train times
-    # # n = 5
-    # n = 10
-    # # n = 50
+    # n = 5
     #
     # SRD = 3
     # mean_test_acc_overall, mean_f1_overall = multi_train(

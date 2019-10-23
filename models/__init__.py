@@ -4,4 +4,3 @@
 # Copyright (C) 2019. All Rights Reserved.
 
 from models.lcf_bert import LCF_BERT
-from models.lcf_glove import LCF_GLOVE
