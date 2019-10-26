@@ -4,7 +4,6 @@
 # base code: songyouwei <youwei0314@gmail.com>
 # Copyright (C) 2019. All Rights Reserved.
 
-
 from pytorch_transformers import BertModel
 from sklearn import metrics
 import torch
@@ -167,7 +166,7 @@ def single_train():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_name', default='lcf_bert', type=str)
     parser.add_argument('--dataset', default='laptop', type=str, help='twitter, restaurant, laptop')
-    parser.add_argument('--use_single_bert', default=None, type=bool,
+    parser.add_argument('--use_single_bert', default=False, type=bool,
                         help='use the same bert modeling for global context and local context to reduce memory requirement')
     parser.add_argument('--optimizer', default='adam', type=str)
     parser.add_argument('--initializer', default='xavier_uniform_', type=str)

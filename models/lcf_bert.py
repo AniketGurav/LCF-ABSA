@@ -8,7 +8,7 @@ import torch.nn as nn
 import copy
 import numpy as np
 
-from pytorch_pretrained_bert.modeling import BertPooler, BertSelfAttention
+from pytorch_transformers.modeling_bert import BertPooler, BertSelfAttention
 
 
 class SelfAttention(nn.Module):
@@ -23,20 +23,18 @@ class SelfAttention(nn.Module):
         zero_tensor = torch.tensor(np.zeros((inputs.size(0), 1, 1, self.opt.max_seq_len),
                                             dtype=np.float32), dtype=torch.float32).to(self.opt.device)
         SA_out = self.SA(inputs, zero_tensor)
-        return self.tanh(SA_out)
+        return self.tanh(SA_out[0])
 
 class LCF_BERT(nn.Module):
     def __init__(self, bert, opt):
         super(LCF_BERT, self).__init__()
-
-        self.bert_spc = bert
+        self.bert_global_focus = bert
+        self.bert_local_focus = copy.deepcopy(bert) if opt.use_single_bert else bert
         self.opt = opt
-        # self.bert_local = copy.deepcopy(bert)  # Uncomment this line to use dual Bert and improve performance
-        self.bert_local = bert  # Default to use single Bert to reduce memory requirement
         self.dropout = nn.Dropout(opt.dropout)
         self.bert_SA = SelfAttention(bert.config, opt)
-        self.linear_double = nn.Linear(opt.bert_dim * 2, opt.bert_dim)
-        self.linear_single = nn.Linear(opt.bert_dim, opt.bert_dim)
+        self.dinear_double_cdm_or_cdw = nn.Linear(opt.bert_dim * 2, opt.bert_dim)
+        self.linear_triple_lcf_global = nn.Linear(opt.bert_dim * 3, opt.bert_dim)
         self.bert_pooler = BertPooler(bert.config)
         self.dense = nn.Linear(opt.bert_dim, opt.polarities_dim)
 
@@ -58,7 +56,7 @@ class LCF_BERT(nn.Module):
                 mask_begin = 0
             for i in range(mask_begin):
                 masked_text_raw_indices[text_i][i] = np.zeros((self.opt.bert_dim), dtype=np.float)
-            for j in range(asp_begin + asp_len + mask_len, self.opt.max_seq_len):
+            for j in range(asp_begin + asp_len + mask_len + 1, self.opt.max_seq_len):
                 masked_text_raw_indices[text_i][j] = np.zeros((self.opt.bert_dim), dtype=np.float)
         masked_text_raw_indices = torch.from_numpy(masked_text_raw_indices)
         return masked_text_raw_indices.to(self.opt.device)
@@ -87,46 +85,38 @@ class LCF_BERT(nn.Module):
         masked_text_raw_indices = torch.from_numpy(masked_text_raw_indices)
         return masked_text_raw_indices.to(self.opt.device)
 
+
     def forward(self, inputs):
         text_bert_indices = inputs[0]
         bert_segments_ids = inputs[1]
         text_local_indices = inputs[2]
         aspect_indices = inputs[3]
 
-        bert_spc_out, _ = self.bert_spc(text_bert_indices, bert_segments_ids, output_all_encoded_layers=False)
-        bert_spc_out = self.dropout(bert_spc_out)
-
-        bert_local_out, _ = self.bert_local(text_local_indices, output_all_encoded_layers=False)
-        bert_local_out = self.dropout(bert_local_out)
+        bert_global_out, _ = self.bert_global_focus(text_bert_indices, bert_segments_ids)
+        bert_local_out, _ = self.bert_local_focus(text_local_indices)
 
         if self.opt.local_context_focus == 'cdm':
             masked_local_text_vec = self.feature_dynamic_mask(text_local_indices, aspect_indices)
             bert_local_out = torch.mul(bert_local_out, masked_local_text_vec)
+            out_cat = torch.cat((bert_local_out, bert_global_out), dim=-1)
+            mean_pool = self.dinear_double_cdm_or_cdw(out_cat)
 
         elif self.opt.local_context_focus == 'cdw':
             weighted_text_local_features = self.feature_dynamic_weighted(text_local_indices, aspect_indices)
             bert_local_out = torch.mul(bert_local_out, weighted_text_local_features)
+            out_cat = torch.cat((bert_local_out, bert_global_out), dim=-1)
+            mean_pool = self.dinear_double_cdm_or_cdw(out_cat)
 
-        out_cat = torch.cat((bert_local_out, bert_spc_out), dim=-1)
-        mean_pool = self.linear_double(out_cat)
+        elif self.opt.local_context_focus == 'lcf_fusion':
+            masked_local_text_vec = self.feature_dynamic_mask(text_local_indices, aspect_indices)
+            bert_masked_local_out = torch.mul(bert_local_out, masked_local_text_vec)
+            weighted_text_local_features = self.feature_dynamic_weighted(text_local_indices, aspect_indices)
+            bert_weighted_local_out = torch.mul(bert_local_out, weighted_text_local_features)
+            out_cat = torch.cat((bert_masked_local_out, bert_global_out, bert_weighted_local_out), dim=-1)
+            mean_pool = self.linear_triple_lcf_global(out_cat)
+
         self_attention_out = self.bert_SA(mean_pool)
+        self_attention_out = self.dropout(self_attention_out)
         pooled_out = self.bert_pooler(self_attention_out)
         dense_out = self.dense(pooled_out)
-
-        # # for lcf-bert CDW/CDM ablation experiment
-        # mean_pool = self.mean_pooling_single(bert_local_out)
-        # self_attention_out = self.bert_SA(mean_pool)
-        # pooled_out = self.bert_pooler(self_attention_out)
-        # dense_out = self.dense(pooled_out)
-
-        # # for lcf-bert global ablation experiment
-        # pooled_out = self.bert_pooler(bert_spc_out)
-        # dense_out = self.dense(pooled_out)
-
-        # # for lcf-bert without FIL layer
-        # out_cat = torch.cat((bert_local_out, bert_spc_out), dim=-1)
-        # mean_pool = self.mean_pooling_double(out_cat)
-        # mean_pool = self.bert_pooler(mean_pool)
-        # dense_out = self.dense(mean_pool)
-
         return dense_out
