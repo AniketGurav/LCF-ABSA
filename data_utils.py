@@ -8,10 +8,44 @@
 import os
 import pickle
 import numpy as np
-import torch
 from torch.utils.data import Dataset
-from pytorch_pretrained_bert import BertTokenizer
+from pytorch_transformers import BertTokenizer
+import argparse
+import json
 
+def parse_experiments(path):
+
+
+    configs = []
+
+    opt = argparse.ArgumentParser()
+    with open(path, "r", encoding='utf-8') as reader:
+        json_config = json.loads(reader.read())
+    for id, config in json_config.items():
+        # Hyper Parameters
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--model_name', default=config['model_name'], type=str)
+        parser.add_argument('--dataset', default=config['dataset'], type=str, help='twitter, restaurant, laptop')
+        parser.add_argument('--use_single_bert', default=config['use_single_bert'], type=bool,
+                            help='use the same bert layer for global context and local context to reduce memory requirement')
+        parser.add_argument('--optimizer', default=config['optimizer'], type=str)
+        parser.add_argument('--initializer', default=config['initializer'], type=str)
+        parser.add_argument('--learning_rate', default=config['learning_rate'], type=float)
+        parser.add_argument('--dropout', default=config['dropout'], type=float)
+        parser.add_argument('--l2reg', default=config['l2reg'], type=float)
+        parser.add_argument('--num_epoch', default=config['num_epoch'], type=int)
+        parser.add_argument('--batch_size', default=config['batch_size'], type=int)
+        parser.add_argument('--log_step', default=config['log_step'], type=int)
+        parser.add_argument('--logdir', default=config['logdir'], type=str)
+        parser.add_argument('--bert_dim', default=config['bert_dim'], type=int)
+        parser.add_argument('--pretrained_bert_name', default=config['pretrained_bert_name'], type=str)
+        parser.add_argument('--max_seq_len', default=config['max_seq_len'], type=int)
+        parser.add_argument('--polarities_dim', default=config['polarities_dim'], type=int)
+        parser.add_argument('--hops', default=config['hops'], type=int)
+        parser.add_argument('--SRD', default=config['SRD'], type=int)
+        parser.add_argument('--local_context_focus', default=config['local_context_focus'], type=str)
+        configs.append(parser.parse_args())
+    return configs
 
 def build_tokenizer(fnames, max_seq_len, dat_fname):
     if os.path.exists(dat_fname):
@@ -54,13 +88,11 @@ def build_embedding_matrix(word2idx, embed_dim, dat_fname):
         embedding_matrix = np.zeros((len(word2idx) + 2, embed_dim))  # idx 0 and len(word2idx)+1 are all-zeros
         fname = './glove.twitter.27B/glove.twitter.27B.' + str(embed_dim) + 'd.txt' \
             if embed_dim != 300 else './glove.840B.300d.txt'
-            # if embed_dim != 300 else './glove.42B.300d.txt'
         word_vec = _load_word_vec(fname, word2idx=word2idx)
         print('building embedding_matrix:', dat_fname)
         for word, i in word2idx.items():
             vec = word_vec.get(word)
             if vec is not None:
-                # words not found in embedding index will be all-zeros.
                 embedding_matrix[i] = vec
         pickle.dump(embedding_matrix, open(dat_fname, 'wb'))
     return embedding_matrix
@@ -124,7 +156,7 @@ class Tokenizer4Bert:
             sequence = sequence[::-1]
         return pad_and_truncate(sequence, self.max_seq_len, padding=padding, truncating=truncating)
 
-import string
+
 class ABSADataset(Dataset):
     def __init__(self, fname, tokenizer):
         fin = open(fname, 'r', encoding='utf-8', newline='\n', errors='ignore')
@@ -136,18 +168,18 @@ class ABSADataset(Dataset):
             text_left, _, text_right = [s.lower().strip() for s in lines[i].partition("$T$")]
             aspect = lines[i + 1].lower().strip()
             polarity = lines[i + 2].strip()
-            text_raw_indices = tokenizer.text_to_sequence(text_left + " " + aspect + " " + text_right)
-            text_left_indices = tokenizer.text_to_sequence(text_left, reverse=False)
-            text_right_indices = tokenizer.text_to_sequence(text_right, reverse=False)
-            text_right_with_aspect_indices = tokenizer.text_to_sequence(" " + aspect + " " + text_right, reverse=False)
+            polarity = int(polarity) + 1
+
             aspect_indices = tokenizer.text_to_sequence(aspect)
             aspect_len = np.sum(aspect_indices != 0)
-            polarity = int(polarity) + 1
+            text_left = ' '.join(text_left.split(' ')[int(-(tokenizer.max_seq_len-aspect_len)/2-5):])
+            text_right = ' '.join(text_right.split(' ')[:int((tokenizer.max_seq_len-aspect_len)/2-5)])
+            text_raw = text_left +' '+ aspect +' '+ text_right
+            text_raw_indices = tokenizer.text_to_sequence(text_raw)
 
             text_bert_indices = tokenizer.text_to_sequence('[CLS] ' + text_left + " " + aspect + " " + text_right + ' [SEP] ' + aspect + " [SEP]")
             bert_segments_ids = np.asarray([0] * (np.sum(text_raw_indices != 0) + 2) + [1] * (aspect_len + 1))
             bert_segments_ids = pad_and_truncate(bert_segments_ids, tokenizer.max_seq_len)
-
 
             text_raw_bert_indices = tokenizer.text_to_sequence("[CLS] " + text_left + " " + aspect + " " + text_right + " [SEP]")
             aspect_bert_indices = tokenizer.text_to_sequence("[CLS] " + aspect + " [SEP]")
@@ -158,8 +190,6 @@ class ABSADataset(Dataset):
                 'bert_segments_ids': bert_segments_ids,
                 'text_raw_bert_indices': text_raw_bert_indices,
                 'aspect_bert_indices': aspect_bert_indices,
-                'text_raw_indices': text_raw_indices,
-                'aspect_indices': aspect_indices,
                 'polarity': polarity,
             }
 

@@ -1,5 +1,5 @@
 # LCF-ABSA
-The LCF-BERT model also can be found at [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch)
+This is the up-to-date version which transferred pytorch-pretrained-bert to pytorch-transformers, andaAn earlier version of LCF-BERT models can be found at [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch)
 
 > Pytorch Implementations.
 
@@ -52,9 +52,9 @@ This repository can achieving superior performance with [BERT-ADA](https://arxiv
 
 | Models            | Restaurant (acc)  | Laptop (acc)  |  Twitter(acc) 
 | -------------     | :-----:           | :-----:       | ---           | 
-| LCF-BERT-CDM      |                   | 82.92         |               | 
-| LCF-BERT-CDW      |                   |               |               | 
-| LCF-BERT-Fusion   |                   |               | 77.17         | 
+| LCF-BERT-CDM      | 89.11             | 82.92         |               | 
+| LCF-BERT-CDW      |                   |               | 77.17         | 
+| LCF-BERT-Fusion   | 89.55             |               |               | 
 
 The state-of-the-art benchmarks of the ABSA task can be found at [NLP-progress](https://nlpprogress.com) (See Section of SemEval-2014 subtask4)
 
