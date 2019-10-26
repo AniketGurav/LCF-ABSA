@@ -1,5 +1,5 @@
 # LCF-ABSA
-This is the up-to-date version which transferred pytorch-pretrained-bert to pytorch-transformers, andaAn earlier version of LCF-BERT models can be found at [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch)
+This is the up-to-date version which transferred pytorch-pretrained-bert to pytorch-transformers, and an earlier version of LCF-BERT models can be found at [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch)
 
 > Pytorch Implementations.
 
@@ -12,22 +12,21 @@ This is the up-to-date version which transferred pytorch-pretrained-bert to pyto
 * python 3.7
 * pytorch >=1.0
 * [Pytorch-transformers](https://github.com/huggingface/transformers)
-* To unleash peroformance of LCF-BERT models, a GTX 1080Ti or other GPU equipped with large memory is required.
-
+* To unleash the performance of LCF-BERT models, a GTX 1080Ti or other GPU equipped with a large memory is required.
 ## Datasets
 
-* SemEval-2014 (Resetaurant and Laptop datasets) 
+* SemEval-2014 (Restaurant and Laptop datasets) 
 * ACL twitter dataset
 
 ## Train
 
-Train the model by
+Train the model
 
 ```
 python train.py --model lcf_bert --dataset laptop --SRD 3 --local_context_focus cdm --use_single_bert
 ```
 
-or try to train in batchs
+or try to train in batches
 
 ```
 python batch_train.py --config experiments.json
@@ -36,7 +35,7 @@ python batch_train.py --config experiments.json
  Try to assign *use_single_bert = true* while out-of-memory error occurs.
 
 ## Performance of LCF design models
-Performance based on the pytorch pretrained model of bert-base-uncased.
+The performance based on the pytorch pre-trained model of bert-base-uncased.
 
 | Models           | Restaurant (acc) | Laptop (acc) |  Twitter(acc) 
 | ------------- | :-----:| :-----:| --- | 
@@ -48,7 +47,7 @@ Performance based on the pytorch pretrained model of bert-base-uncased.
 Generally, the best performance needs several independent training processes.
 
 ### For Better Performance
-This repository can achieving superior performance with [BERT-ADA](https://arxiv.org/pdf/1908.11860.pdf) pretrained models. Learn to train the domain adapted BERT pretraiend models from [domain-adapted-atsc](https://github.com/deepopinion/domain-adapted-atsc), and place the pretrained models in *bert_pretrained_models*. The results in following table are the best of five trainings (random seed 0, 1, 2, 3, 4). Try set other random seeds to explore different results.
+This repository can achieve superior performance with [BERT-ADA](https://arxiv.org/pdf/1908.11860.pdf) pre-trained models. Learn to train the domain adapted BERT pretrained models from [domain-adapted-atsc](https://github.com/deepopinion/domain-adapted-atsc), and place the pre-trained models in bert_pretrained_models. The results in the following table are the best of five training processes (random seed 0, 1, 2, 3, 4). Try to set other random seeds to explore different results.
 
 | Models            | Restaurant (acc)  | Laptop (acc)  |  Twitter(acc) 
 | -------------     | :-----:           | :-----:       | ---           | 
@@ -61,7 +60,7 @@ The state-of-the-art benchmarks of the ABSA task can be found at [NLP-progress](
 ## Acknowlegement
 
 Our work is based on the repositories of [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch) and the [Pytorch-transformers](https://github.com/huggingface/transformers). Thanks to the authors for their devotion and Thanks to everyone who offered assistance.
-Feel free to report any bug or discuss with us. 
+Feel free to report any bug or discussing with us. 
 
 ## Citation
 If this repository is helpful to you, please cite our paper:
