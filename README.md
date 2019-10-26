@@ -47,7 +47,7 @@ The performance based on the pytorch pre-trained model of bert-base-uncased.
 Generally, the best performance needs several independent training processes.
 
 ### For Better Performance
-This repository can achieve superior performance with [BERT-ADA](https://arxiv.org/pdf/1908.11860.pdf) pre-trained models. Learn to train the domain adapted BERT pretrained models from [domain-adapted-atsc](https://github.com/deepopinion/domain-adapted-atsc), and place the pre-trained models in bert_pretrained_models. The results in the following table are the best of five training processes (random seed 0, 1, 2, 3, 4), view the [training log](./log/train.log). Try to set other random seeds to explore different results.
+This repository can achieve superior performance with [BERT-ADA](https://arxiv.org/pdf/1908.11860.pdf) pre-trained models. Learn to train the domain adapted BERT pretrained models from [domain-adapted-atsc](https://github.com/deepopinion/domain-adapted-atsc), and place the pre-trained models in bert_pretrained_models. The results in the following table are the best of five training processes (random seed 0, 1, 2, 3, 4), view the [training log](./train.log). Try to set other random seeds to explore different results.
 
 | Models            | Restaurant (acc)  | Laptop (acc)  |  Twitter(acc) 
 | -------------     | :-----:           | :-----:       | ---           | 
