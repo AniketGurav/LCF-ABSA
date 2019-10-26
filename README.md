@@ -51,9 +51,9 @@ This repository can achieving follow performance with BERT-ADA pretrained models
 
 | Models            | Restaurant (acc)  | Laptop (acc)  |  Twitter(acc) 
 | -------------     | :-----:           | :-----:       | ---           | 
-| LCF-BERT-CDM      | 89.11             | 82.92         |               | 
-| LCF-BERT-CDW      |                   | 82.45         |               | 
-| LCF-BERT-Fusion   | 89.55             |               | 77.17         | 
+| LCF-BERT-CDM      |                   | 82.92         |               | 
+| LCF-BERT-CDW      |                   |               |               | 
+| LCF-BERT-Fusion   |                   |               | 77.17         | 
 
 The state-of-the-art benchmarks of the ABSA task can be found at [NLP-progress](https://nlpprogress.com) (See Section of SemEval-2014 subtask4)
 
