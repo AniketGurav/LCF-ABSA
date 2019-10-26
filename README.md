@@ -33,9 +33,10 @@ or try to train in batchs
 python batch_train.py --config experiments.json
 ```
 
-If out-of-memory occurs try 
+ Try to assign *use_single_bert = true* while out-of-memory error occurs.
 
 ## Performance of LCF design models
+Performance based on the pytorch pretrained model of bert-base-uncased.
 
 | Models           | Restaurant (acc) | Laptop (acc) |  Twitter(acc) 
 | ------------- | :-----:| :-----:| --- | 
@@ -47,7 +48,7 @@ If out-of-memory occurs try
 Generally, the best performance needs several independent training processes.
 
 ### For Better Performance
-This repository can achieving follow performance with BERT-ADA pretrained models. Learn to train the domain adapted BERT pretraiend models from [domain-adapted-atsc](https://github.com/deepopinion/domain-adapted-atsc), and place the pretrained models in *bert_pretrained_models*. The results in following table are the best of five trainings (random seed 1, 2, 3, 4, 5). Try set other random seeds to explore different results.
+This repository can achieving superior performance with [BERT-ADA](https://arxiv.org/pdf/1908.11860.pdf) pretrained models. Learn to train the domain adapted BERT pretraiend models from [domain-adapted-atsc](https://github.com/deepopinion/domain-adapted-atsc), and place the pretrained models in *bert_pretrained_models*. The results in following table are the best of five trainings (random seed 0, 1, 2, 3, 4). Try set other random seeds to explore different results.
 
 | Models            | Restaurant (acc)  | Laptop (acc)  |  Twitter(acc) 
 | -------------     | :-----:           | :-----:       | ---           | 
@@ -75,3 +76,8 @@ If this repository is helpful to you, please cite our paper:
         year={2019},
         publisher={Multidisciplinary Digital Publishing Institute}
     }
+
+## Reference 
+
+[Adapt or Get Left Behind: Domain Adaptation through BERT Language Model Finetuning for Aspect-Target Sentiment Classification](https://arxiv.org/pdf/1908.11860.pdf)
+
