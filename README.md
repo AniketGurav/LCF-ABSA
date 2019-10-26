@@ -1,16 +1,18 @@
 # LCF-ABSA
-This repository also can be found at [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch)
+The LCF-BERT model also can be found at [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch)
 
 > Pytorch Implementations.
 
-> Aspect-based Sentiment Analysis (ABSA/ABSC)
+> Pytorch-transformers.
+
+> Aspect-based Sentiment Analysis (ABSA/ABSC).
 
 
 ## Requirement
 * python 3.7
 * pytorch >=1.0
-* [pytorch-pretrained-bert](https://pypi.org/project/pytorch-pretrained-bert/) >= 0.6.1
-* For LCF-BERT models, a GTX 1080Ti or other GPU equipped with large memory is required.
+* [Pytorch-transformers](https://github.com/huggingface/transformers)
+* To unleash peroformance of LCF-BERT models, a GTX 1080Ti or other GPU equipped with large memory is required.
 
 ## Datasets
 
@@ -19,11 +21,19 @@ This repository also can be found at [ABSA-PyTorch](https://github.com/songyouwe
 
 ## Train
 
+Train the model by
 
 ```
-python train.py --model lcf_bert --dataset laptop --SRD 3 --local_context_focus cdm
+python train.py --model lcf_bert --dataset laptop --SRD 3 --local_context_focus cdm --use_single_bert
 ```
 
+or try to train in batchs
+
+```
+python batch_train.py --config experiments.json
+```
+
+If out-of-memory occurs try 
 
 ## Performance of LCF design models
 
@@ -36,26 +46,32 @@ python train.py --model lcf_bert --dataset laptop --SRD 3 --local_context_focus 
 
 Generally, the best performance needs several independent training processes.
 
+### For Better Performance
+This repository can achieving follow performance with BERT-ADA pretrained models. Learn to train the domain adapted BERT pretraiend models from [domain-adapted-atsc](https://github.com/deepopinion/domain-adapted-atsc), and place the pretrained models in *bert_pretrained_models*. The results in following table are the best of five trainings (random seed 1, 2, 3, 4, 5). Try set other random seeds to explore different results.
+
+| Models            | Restaurant (acc)  | Laptop (acc)  |  Twitter(acc) 
+| -------------     | :-----:           | :-----:       | ---           | 
+| LCF-BERT-CDM      |                   | 82.92         |               | 
+| LCF-BERT-CDW      |                   |               |               | 
+| LCF-BERT-Fusion   |                   |               | 77.17         | 
+
 The state-of-the-art benchmarks of the ABSA task can be found at [NLP-progress](https://nlpprogress.com) (See Section of SemEval-2014 subtask4)
-
-## Notice
-
-This repository is the raw code for [LCF: A Local Context Focused Aspect-based Sentiment Classiﬁcation with Pre-trained BERT](https://www.mdpi.com/2076-3417/9/16/3389/pdf), and unexpected problem may occurs on different platforms.
 
 ## Acknowlegement
 
-Our work is based on the repositories [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch) and the pytorch-pretrained-bert. Thanks to the authors for their devotion and Thanks to all the scholars who offered assistance.
+Our work is based on the repositories of [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch) and the [Pytorch-transformers](https://github.com/huggingface/transformers). Thanks to the authors for their devotion and Thanks to everyone who offered assistance.
+Feel free to report any bug or discuss with us. 
 
 ## Citation
-If this repository is helpful to you, please cite our paper as follows:
+If this repository is helpful to you, please cite our paper:
 
     @article{zeng2019lcf,
-    title={LCF: A Local Context Focus Mechanism for Aspect-Based Sentiment Classification},
-    author={Zeng, Biqing and Yang, Heng and Xu, Ruyang and Zhou, Wu and Han, Xuli},
-    journal={Applied Sciences},
-    volume={9},
-    number={16},
-    pages={3389},
-    year={2019},
-    publisher={Multidisciplinary Digital Publishing Institute}
+        title={LCF: A Local Context Focus Mechanism for Aspect-Based Sentiment Classification},
+        author={Zeng, Biqing and Yang, Heng and Xu, Ruyang and Zhou, Wu and Han, Xuli},
+        journal={Applied Sciences},
+        volume={9},
+        number={16},
+        pages={3389},
+        year={2019},
+        publisher={Multidisciplinary Digital Publishing Institute}
     }
