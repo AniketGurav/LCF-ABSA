@@ -32,7 +32,7 @@ or try to train in batches
 python batch_train.py --config experiments.json
 ```
 
- Try to assign *use_single_bert = true* while out-of-memory error occurs.
+ Try to assign set *max_seq_len = 40* and *use_single_bert = true* while out-of-memory error occurs.
 
 ## Performance of LCF design models
 The performance based on the pytorch pre-trained model of bert-base-uncased.
@@ -47,13 +47,13 @@ The performance based on the pytorch pre-trained model of bert-base-uncased.
 Generally, the best performance needs several independent training processes.
 
 ### For Better Performance
-This repository can achieve superior performance with [BERT-ADA](https://arxiv.org/pdf/1908.11860.pdf) pre-trained models. Learn to train the domain adapted BERT pretrained models from [domain-adapted-atsc](https://github.com/deepopinion/domain-adapted-atsc), and place the pre-trained models in bert_pretrained_models. The results in the following table are the best of five training processes (random seed 0, 1, 2, 3, 4), view the [training log](./train.log). Try to set other random seeds to explore different results.
+This repository can achieve superior performance with [BERT-ADA](https://arxiv.org/pdf/1908.11860.pdf) pre-trained models. Learn to train the domain adapted BERT pretrained models from [domain-adapted-atsc](https://github.com/deepopinion/domain-adapted-atsc), and place the pre-trained models in bert_pretrained_models. The results in the following table are the best of five training processes (random seed 0, 1, 2, 3, 4), Refer to the training [log](./train.log) to reproduce the result. Try to set other random seeds to explore different results.
 
 | Models            | Restaurant (acc)  | Laptop (acc)  |  Twitter(acc) 
 | -------------     | :-----:           | :-----:       | ---           | 
-| LCF-BERT-CDM      | 89.11             | 82.92         | 78.47         | 
-| LCF-BERT-CDW      | 89.46             | 82.92         | 77.17         | 
-| LCF-BERT-Fusion   | 89.55             | 82.45         | 77.85         | 
+| LCF-BERT-CDM      | 89.11             | 82.92         | 77.89         | 
+| LCF-BERT-CDW      | 89.38             | 82.76         | 77.17         | 
+| LCF-BERT-Fusion   | 88.95             | 82.45         | 77.75         | 
 
 The state-of-the-art benchmarks of the ABSA task can be found at [NLP-progress](https://nlpprogress.com) (See Section of SemEval-2014 subtask4)
 
