@@ -34,7 +34,7 @@ or try to train in batches
 python batch_training.py --config experiments.json
 ```
 
- Try to set *max_seq_len = 40* and *use_single_bert = true* while out-of-memory error occurs.
+ Try to set '*batch_size=8*', *'max_seq_len = 40'* or *'use_single_bert = True'* while out-of-memory error occurs.
 
 ## Performance of LCF design models
 The performance based on the pytorch pre-trained model of bert-base-uncased.
