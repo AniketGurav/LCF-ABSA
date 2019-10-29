@@ -1,4 +1,6 @@
 # LCF-ABSA
+code for paper [LCF: A Local Context Focus Mechanism for Aspect-Based Sentiment Classification](https://www.mdpi.com/2076-3417/9/16/3389). 
+
 This is the up-to-date version which transferred pytorch-pretrained-bert to pytorch-transformers, and an earlier version of LCF-BERT models can be found at [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch)
 
 > Pytorch Implementations.
