@@ -20,7 +20,7 @@ This is the up-to-date version which transferred pytorch-pretrained-bert to pyto
 
 ## Train
 
-Train the model
+Train the model with cmd
 
 ```
 python train.py --model lcf_bert --dataset laptop --SRD 3 --local_context_focus cdm --use_single_bert
@@ -29,10 +29,10 @@ python train.py --model lcf_bert --dataset laptop --SRD 3 --local_context_focus 
 or try to train in batches
 
 ```
-python batch_train.py --config experiments.json
+python batch_training.py --config experiments.json
 ```
 
- Try to assign set *max_seq_len = 40* and *use_single_bert = true* while out-of-memory error occurs.
+ Try to set *max_seq_len = 40* and *use_single_bert = true* while out-of-memory error occurs.
 
 ## Performance of LCF design models
 The performance based on the pytorch pre-trained model of bert-base-uncased.
@@ -44,10 +44,8 @@ The performance based on the pytorch pre-trained model of bert-base-uncased.
 | LCF-BERT-CDM | 86.52 | 82.29 | 76.45| 
 | LCF-BERT-CDW | 87.14 | 82.45 | 77.31| 
 
-Generally, the best performance needs several independent training processes.
-
 ### For Better Performance
-This repository can achieve superior performance with [BERT-ADA](https://arxiv.org/pdf/1908.11860.pdf) pre-trained models. Learn to train the domain adapted BERT pretrained models from [domain-adapted-atsc](https://github.com/deepopinion/domain-adapted-atsc), and place the pre-trained models in bert_pretrained_models. The results in the following table are the best of five training processes (random seed 0, 1, 2, 3, 4), Refer to the training [log](./train.log) to reproduce the result. Try to set other random seeds to explore different results.
+This repository can achieve superior performance with [BERT-ADA](https://arxiv.org/pdf/1908.11860.pdf) pre-trained models. Learn to train the domain adapted BERT pretrained models from [domain-adapted-atsc](https://github.com/deepopinion/domain-adapted-atsc), and place the pre-trained models in bert_pretrained_models. The results in the following table are the best of five training processes (random seed 0, 1, 2, 3, 4), Refer to the training [log](./train.log) to reproduce the results. Try to set other random seeds to explore different results.
 
 | Models            | Restaurant (acc)  | Laptop (acc)  |  Twitter(acc) 
 | -------------     | :-----:           | :-----:       | ---           | 
