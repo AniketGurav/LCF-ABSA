@@ -14,7 +14,8 @@ This is the up-to-date version which transferred pytorch-pretrained-bert to pyto
 * python 3.7
 * pytorch >=1.0
 * [Pytorch-transformers](https://github.com/huggingface/transformers)
-* To unleash the performance of LCF-BERT models, a GTX 1080Ti or other GPU equipped with a large memory is required.
+* To unleash the performance of LCF-BERT models, a GTX 1080Ti or other GPU equipped with a large memory is required. 
+* `In fact, the memory consumption of this model can be significantly optimized in several ways (minize to 6GB of RAM).`
 ## Datasets
 
 * SemEval-2014 (Restaurant and Laptop datasets) 
