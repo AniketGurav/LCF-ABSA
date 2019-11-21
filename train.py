@@ -170,7 +170,7 @@ def single_train():
                         help='use the same bert modeling for global context and local context to reduce memory requirement')
     parser.add_argument('--optimizer', default='adam', type=str)
     parser.add_argument('--initializer', default='xavier_uniform_', type=str)
-    parser.add_argument('--learning_rate', default=0.001, type=float)
+    parser.add_argument('--learning_rate', default=0.00001, type=float)
     parser.add_argument('--dropout', default=0, type=float)
     parser.add_argument('--l2reg', default=0.00001, type=float)
     parser.add_argument('--num_epoch', default=5, type=int)
@@ -182,7 +182,8 @@ def single_train():
     parser.add_argument('--bert_dim', default=768, type=int)
     # parser.add_argument('--pretrained_bert_name', default='bert-based-uncased', type=str)
     # if there are domain adapted pretrained models
-    parser.add_argument('--pretrained_bert_name', default='bert_pretrained_models/laptop', type=str)
+    parser.add_argument('--pretrained_bert_name', default='bert-base-uncased', type=str)
+    # parser.add_argument('--pretrained_bert_name', default='bert_pretrained_models/laptop', type=str)
     # parser.add_argument('--pretrained_bert_name', default='bert_pretrained_models/restaurant', type=str)
     parser.add_argument('--max_seq_len', default=80, type=int)
     parser.add_argument('--polarities_dim', default=3, type=int)
