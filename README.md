@@ -1,9 +1,6 @@
 # LCF-ABSA
 
-Here is new paper aims at Chinese and multilingual-oriented Aspect Polarity Classification and Aspect Term Extraction:
-[A Multi-task Learning Model for Chinese-oriented Aspect Polarity Classification and Aspect Term Extraction](https://arxiv.org/abs/1912.07976), the codes are available at: [LCF-ATEPC](https://github.com/yangheng95/LCF-ATEPC).
-
-code for paper [LCF: A Local Context Focus Mechanism for Aspect-Based Sentiment Classification](https://www.mdpi.com/2076-3417/9/16/3389).
+code for our paper [LCF: A Local Context Focus Mechanism for Aspect-Based Sentiment Classification](https://www.mdpi.com/2076-3417/9/16/3389).
 
 This is the up-to-date version which transferred pytorch-pretrained-bert to pytorch-transformers, and an earlier version of LCF-BERT models can be found at [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch).
 
@@ -15,9 +12,9 @@ This is the up-to-date version which transferred pytorch-pretrained-bert to pyto
 
 
 ## Requirement
-* python 3.7
+* python 3.7 (recommended)
 * pytorch >=1.0
-* [Pytorch-transformers](https://github.com/huggingface/transformers)
+* [Pytorch-transformers](https://github.com/huggingface/transformers) >= 0.6.2
 * To unleash the performance of LCF-BERT models, a GTX 1080Ti or other GPU equipped with a large memory is required. 
 * `In fact, the memory consumption of this model can be significantly optimized in several ways (minize to 6GB of RAM).`
 ## Datasets
@@ -42,7 +39,8 @@ python batch_training.py --config experiments.json
  Try to set '*batch_size=8*', *'max_seq_len = 40'* or *'use_single_bert = True'* while out-of-memory error occurs.
 
 ## Performance of LCF design models
-The performance based on the pytorch pre-trained model of bert-base-uncased.
+The performance based on the pytorch pre-trained model of bert-base-uncased. 
+``The results below are the best performance so try to set the different random seed to reproduce the result. (The original has been refactored and migrated from pytroch-pretrained-bert to pytorch-transformer and not all experiments are reproduced under current code version)``
 
 | Models           | Restaurant (acc) | Laptop (acc) |  Twitter(acc) 
 | ------------- | :-----:| :-----:| --- | 
