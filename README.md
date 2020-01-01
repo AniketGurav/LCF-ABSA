@@ -10,12 +10,17 @@ This is the up-to-date version which transferred pytorch-pretrained-bert to pyto
 
 > Aspect-based Sentiment Analysis (ABSA/ABSC).
 
+> Here is new paper aims at Chinese and multilingual-oriented Aspect Polarity Classification and Aspect Term Extraction:
+[A Multi-task Learning Model for Chinese-oriented Aspect Polarity Classification and Aspect Term Extraction](https://arxiv.org/abs/1912.07976), the codes are available at: [LCF-ATEPC](https://github.com/yangheng95/LCF-ATEPC).
+
+
 
 ## Requirement
 * python 3.7 (recommended)
 * pytorch >=1.0
 * [Pytorch-transformers](https://github.com/huggingface/transformers) >= 0.6.2
 * To unleash the performance of LCF-BERT models, a GTX 1080Ti or other GPU equipped with a large memory is required. 
+
 * `In fact, the memory consumption of this model can be significantly optimized in several ways (minize to 6GB of RAM).`
 ## Datasets
 
@@ -33,10 +38,10 @@ python train.py --model lcf_bert --dataset laptop --SRD 3 --local_context_focus 
 or try to train in batches
 
 ```
-python batch_training.py --config experiments.json
+python batch_training.py --config experiments_glove.json
 ```
 
- Try to set '*batch_size=8*', *'max_seq_len = 40'* or *'use_single_bert = True'* while out-of-memory error occurs.
+ Try to set '*batch_size=8*' or *'use_single_bert = True'* while out-of-memory error occurs.
 
 ## Performance of LCF design models
 The performance based on the pytorch pre-trained model of bert-base-uncased. 
@@ -60,9 +65,9 @@ This repository can achieve superior performance with [BERT-ADA](https://arxiv.o
 
 The state-of-the-art benchmarks of the ABSA task can be found at [NLP-progress](https://nlpprogress.com) (See Section of SemEval-2014 subtask4)
 
-## Acknowlegement
+## Acknowledgement
 
-Our work is based on the repositories of [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch) and the [Pytorch-transformers](https://github.com/huggingface/transformers). Thanks to the authors for their devotion and Thanks to everyone who offered assistance.
+This work is based on the repositories of [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch) and the [Pytorch-transformers](https://github.com/huggingface/transformers). Thanks to the authors for their devotion and Thanks to everyone who offered assistance.
 Feel free to report any bug or discussing with us. 
 
 ## Citation

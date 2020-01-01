@@ -14,12 +14,12 @@ import math
 import os
 import numpy, random
 
-from data_utils import Tokenizer4Bert, ABSADataset, parse_experiments
+from data_utils import Tokenizer4Bert, ABSADataset, build_embedding_matrix, build_tokenizer
 
-from models import LCF_BERT
+from models import LCF_BERT, LCF_GLOVE
 from models.bert_spc import BERT_SPC
 
-import logging,sys
+import logging, sys
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -29,10 +29,27 @@ logger.addHandler(logging.StreamHandler(sys.stdout))
 class Instructor:
     def __init__(self, opt):
         self.opt = opt
-        tokenizer = Tokenizer4Bert(opt.max_seq_len, opt.pretrained_bert_name)
-        bert = BertModel.from_pretrained(opt.pretrained_bert_name)
+        if 'bert' in opt.model_name:
+            # opt.learning_rate = 2e-5
+            tokenizer = Tokenizer4Bert(opt.max_seq_len, opt.pretrained_bert_name)
+            bert = BertModel.from_pretrained(opt.pretrained_bert_name)
 
-        self.model = opt.model_class(bert, opt).to(opt.device)
+            self.model = opt.model_class(bert, opt).to(opt.device)
+        else:
+            # opt.learning_rate = 0.001
+            tokenizer = build_tokenizer(
+                fnames=[opt.dataset_file['train'], opt.dataset_file['test']],
+                max_seq_len=opt.max_seq_len,
+                dat_fname='{0}_tokenizer.dat'.format(opt.dataset))
+            embedding_matrix = build_embedding_matrix(
+                word2idx=tokenizer.word2idx,
+                embed_dim=opt.embed_dim,
+                dat_fname='{0}_{1}_embedding_matrix.dat'.format(str(opt.embed_dim), opt.dataset))
+            self.model = opt.model_class(embedding_matrix, opt).to(opt.device)
+
+        # tokenizer = Tokenizer4Bert(opt.max_seq_len, opt.pretrained_bert_name)
+        # bert = BertModel.from_pretrained(opt.pretrained_bert_name)
+        # self.model = opt.model_class(bert, opt).to(opt.device)
 
         trainset = ABSADataset(opt.dataset_file['train'], tokenizer)
         testset = ABSADataset(opt.dataset_file['test'], tokenizer)
@@ -164,7 +181,7 @@ class Instructor:
 def single_train():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_name', default='lcf_bert', type=str)
+    parser.add_argument('--model_name', default='lcf_glove', type=str)
     parser.add_argument('--dataset', default='laptop', type=str, help='twitter, restaurant, laptop')
     parser.add_argument('--use_single_bert', default=False, type=bool,
                         help='use the same bert modeling for global context and local context to reduce memory requirement')
@@ -180,11 +197,7 @@ def single_train():
     parser.add_argument('--embed_dim', default=300, type=int)
     parser.add_argument('--hidden_dim', default=300, type=int)
     parser.add_argument('--bert_dim', default=768, type=int)
-    # parser.add_argument('--pretrained_bert_name', default='bert-based-uncased', type=str)
-    # if there are domain adapted pretrained models
     parser.add_argument('--pretrained_bert_name', default='bert-base-uncased', type=str)
-    # parser.add_argument('--pretrained_bert_name', default='bert_pretrained_models/laptop', type=str)
-    # parser.add_argument('--pretrained_bert_name', default='bert_pretrained_models/restaurant', type=str)
     parser.add_argument('--max_seq_len', default=80, type=int)
     parser.add_argument('--polarities_dim', default=3, type=int)
     parser.add_argument('--hops', default=3, type=int)
@@ -204,6 +217,7 @@ def single_train():
 
     model_classes = {
         'bert_spc': BERT_SPC,
+        'lcf_glove': LCF_GLOVE,
         'lcf_bert': LCF_BERT,
         'lca_net': LCF_BERT,
     }
@@ -226,6 +240,7 @@ def single_train():
 
     input_colses = {
         'bert_spc': ['text_bert_indices', 'bert_segments_ids'],
+        'lcf_glove': ['text_raw_indices', 'text_raw_indices', 'aspect_indices'],
         'lcf_bert': ['text_bert_indices', 'bert_segments_ids', 'text_raw_bert_indices', 'aspect_bert_indices'],
         'lca_net': ['text_bert_indices', 'bert_segments_ids', 'text_raw_bert_indices', 'aspect_bert_indices'],
     }

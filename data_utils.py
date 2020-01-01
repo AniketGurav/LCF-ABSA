@@ -37,6 +37,8 @@ def parse_experiments(path):
         parser.add_argument('--batch_size', default=config['batch_size'], type=int)
         parser.add_argument('--log_step', default=config['log_step'], type=int)
         parser.add_argument('--logdir', default=config['logdir'], type=str)
+        parser.add_argument('--hidden_dim', default=300, type=int)
+        parser.add_argument('--embed_dim', default=300, type=int)
         parser.add_argument('--bert_dim', default=config['bert_dim'], type=int)
         parser.add_argument('--pretrained_bert_name', default=config['pretrained_bert_name'], type=str)
         parser.add_argument('--max_seq_len', default=config['max_seq_len'], type=int)
@@ -169,7 +171,6 @@ class ABSADataset(Dataset):
             aspect = lines[i + 1].lower().strip()
             polarity = lines[i + 2].strip()
             polarity = int(polarity) + 1
-
             aspect_indices = tokenizer.text_to_sequence(aspect)
             aspect_len = np.sum(aspect_indices != 0)
             text_left = ' '.join(text_left.split(' ')[int(-(tokenizer.max_seq_len-aspect_len)/2-5):])
@@ -190,6 +191,8 @@ class ABSADataset(Dataset):
                 'bert_segments_ids': bert_segments_ids,
                 'text_raw_bert_indices': text_raw_bert_indices,
                 'aspect_bert_indices': aspect_bert_indices,
+                'text_raw_indices': text_raw_indices,
+                'aspect_indices': aspect_indices,
                 'polarity': polarity,
             }
 

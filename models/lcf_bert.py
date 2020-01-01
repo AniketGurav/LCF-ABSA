@@ -33,11 +33,12 @@ class LCF_BERT(nn.Module):
         self.opt = opt
         self.dropout = nn.Dropout(opt.dropout)
         self.bert_SA = SelfAttention(bert.config, opt)
-        self.dinear_double_cdm_or_cdw = nn.Linear(opt.bert_dim * 2, opt.bert_dim)
+        self.linear_double_cdm_or_cdw = nn.Linear(opt.bert_dim * 2, opt.bert_dim)
         self.linear_triple_lcf_global = nn.Linear(opt.bert_dim * 3, opt.bert_dim)
         self.bert_pooler = BertPooler(bert.config)
         self.dense = nn.Linear(opt.bert_dim, opt.polarities_dim)
 
+    # create the mask tensor for local context features
     def feature_dynamic_mask(self, text_local_indices, aspect_indices):
         texts = text_local_indices.cpu().numpy()
         asps = aspect_indices.cpu().numpy()
@@ -61,6 +62,7 @@ class LCF_BERT(nn.Module):
         masked_text_raw_indices = torch.from_numpy(masked_text_raw_indices)
         return masked_text_raw_indices.to(self.opt.device)
 
+    # create the weights tensor for local context features
     def feature_dynamic_weighted(self, text_local_indices, aspect_indices):
         texts = text_local_indices.cpu().numpy()
         asps = aspect_indices.cpu().numpy()
@@ -85,7 +87,6 @@ class LCF_BERT(nn.Module):
         masked_text_raw_indices = torch.from_numpy(masked_text_raw_indices)
         return masked_text_raw_indices.to(self.opt.device)
 
-
     def forward(self, inputs):
         text_bert_indices = inputs[0]
         bert_segments_ids = inputs[1]
@@ -99,13 +100,13 @@ class LCF_BERT(nn.Module):
             masked_local_text_vec = self.feature_dynamic_mask(text_local_indices, aspect_indices)
             bert_local_out = torch.mul(bert_local_out, masked_local_text_vec)
             out_cat = torch.cat((bert_local_out, bert_global_out), dim=-1)
-            mean_pool = self.dinear_double_cdm_or_cdw(out_cat)
+            out_cat = self.linear_double_cdm_or_cdw(out_cat)
 
         elif self.opt.local_context_focus == 'cdw':
             weighted_text_local_features = self.feature_dynamic_weighted(text_local_indices, aspect_indices)
             bert_local_out = torch.mul(bert_local_out, weighted_text_local_features)
             out_cat = torch.cat((bert_local_out, bert_global_out), dim=-1)
-            mean_pool = self.dinear_double_cdm_or_cdw(out_cat)
+            out_cat = self.linear_double_cdm_or_cdw(out_cat)
 
         elif self.opt.local_context_focus == 'lcf_fusion':
             masked_local_text_vec = self.feature_dynamic_mask(text_local_indices, aspect_indices)
@@ -113,9 +114,9 @@ class LCF_BERT(nn.Module):
             weighted_text_local_features = self.feature_dynamic_weighted(text_local_indices, aspect_indices)
             bert_weighted_local_out = torch.mul(bert_local_out, weighted_text_local_features)
             out_cat = torch.cat((bert_masked_local_out, bert_global_out, bert_weighted_local_out), dim=-1)
-            mean_pool = self.linear_triple_lcf_global(out_cat)
+            out_cat = self.linear_triple_lcf_global(out_cat)
 
-        self_attention_out = self.bert_SA(mean_pool)
+        self_attention_out = self.bert_SA(out_cat)
         self_attention_out = self.dropout(self_attention_out)
         pooled_out = self.bert_pooler(self_attention_out)
         dense_out = self.dense(pooled_out)
