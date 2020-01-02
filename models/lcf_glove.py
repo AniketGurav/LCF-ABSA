@@ -102,9 +102,14 @@ class LCF_GLOVE(nn.Module):
         return masked_text_raw_indices.to(self.opt.device)
 
     def forward(self, inputs):
-        text_local_indices = inputs[0]
-        text_global_indices = inputs[1]
-        aspect_indices = inputs[2]
+        if self.opt.local_context_focus == 'cdm':
+            text_global_indices = inputs[0]
+            text_local_indices = inputs[2]
+            aspect_indices = inputs[3]
+        else:
+            text_global_indices = inputs[2]
+            text_local_indices = inputs[2]
+            aspect_indices = inputs[3]
 
         # embedding layer
         text_global_out = self.embed(text_global_indices)
@@ -127,9 +132,16 @@ class LCF_GLOVE(nn.Module):
         elif self.opt.local_context_focus == 'cdw':
             masked_text_local_features = self.feature_dynamic_weighted(text_local_indices, aspect_indices)
             text_local_out = torch.mul(text_local_out, masked_text_local_features)
+        elif self.opt.local_context_focus == 'lcf_fusion':
+            masked_local_text_vec = self.feature_dynamic_mask(text_local_indices, aspect_indices)
+            bert_masked_local_out = torch.mul(text_global_out, masked_local_text_vec)
+            weighted_text_local_features = self.feature_dynamic_weighted(text_local_indices, aspect_indices)
+            bert_weighted_local_out = torch.mul(text_global_out, weighted_text_local_features)
+            out_cat = torch.cat((bert_masked_local_out, text_global_out, bert_weighted_local_out), dim=-1)
+            text_local_out = self.linear_triple_lcf_global(out_cat)
+
         local_out = self.mha_local_SA(text_local_out)
         global_out = self.mha_global_SA(text_global_out)
-
         # FIL layer
         cat_out = torch.cat((local_out, global_out), dim=-1)
         cat_out = self.mean_pooling_double(cat_out)

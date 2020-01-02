@@ -240,7 +240,7 @@ def single_train():
 
     input_colses = {
         'bert_spc': ['text_bert_indices', 'bert_segments_ids'],
-        'lcf_glove': ['text_raw_indices', 'text_raw_indices', 'aspect_indices'],
+        'lcf_glove': ['text_bert_indices', 'bert_segments_ids', 'text_raw_bert_indices', 'aspect_indices'],
         'lcf_bert': ['text_bert_indices', 'bert_segments_ids', 'text_raw_bert_indices', 'aspect_bert_indices'],
         'lca_net': ['text_bert_indices', 'bert_segments_ids', 'text_raw_bert_indices', 'aspect_bert_indices'],
     }

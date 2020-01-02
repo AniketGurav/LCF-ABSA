@@ -10,14 +10,15 @@ This is the up-to-date version which transferred pytorch-pretrained-bert to pyto
 
 > Aspect-based Sentiment Analysis (ABSA/ABSC).
 
-> Here is new paper aims at Chinese and multilingual-oriented Aspect Polarity Classification and Aspect Term Extraction:
-[A Multi-task Learning Model for Chinese-oriented Aspect Polarity Classification and Aspect Term Extraction](https://arxiv.org/abs/1912.07976), the codes are available at: [LCF-ATEPC](https://github.com/yangheng95/LCF-ATEPC).
+### Multi-task Learning of ABSA
 
+Here is new paper aims at Chinese and multilingual-oriented Aspect Polarity Classification and Aspect Term Extraction:
+[A Multi-task Learning Model for Chinese-oriented Aspect Polarity Classification and Aspect Term Extraction](https://arxiv.org/abs/1912.07976), the codes are available at: [LCF-ATEPC](https://github.com/yangheng95/LCF-ATEPC).
 
 
 ## Requirement
 * python 3.7 (recommended)
-* pytorch >=1.0
+* pytorch >= 1.0
 * [Pytorch-transformers](https://github.com/huggingface/transformers) >= 0.6.2
 * To unleash the performance of LCF-BERT models, a GTX 1080Ti or other GPU equipped with a large memory is required. 
 
