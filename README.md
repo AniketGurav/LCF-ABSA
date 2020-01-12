@@ -10,6 +10,8 @@ This is the up-to-date version which transferred pytorch-pretrained-bert to pyto
 
 > Aspect-based Sentiment Analysis (ABSA/ABSC).
 
+> Chinese Aspect-based Sentiment Analysis
+
 ### Multi-task Learning of ABSA
 
 Here is new paper aims at Chinese and multilingual-oriented Aspect Polarity Classification and Aspect Term Extraction:
@@ -27,6 +29,7 @@ Here is new paper aims at Chinese and multilingual-oriented Aspect Polarity Clas
 
 * SemEval-2014 (Restaurant and Laptop datasets) 
 * ACL twitter dataset
+* Chinese Review Datasets
 
 ## Train
 

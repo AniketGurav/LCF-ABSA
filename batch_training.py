@@ -28,11 +28,6 @@ logger.addHandler(logging.StreamHandler(sys.stdout))
 class Instructor:
     def __init__(self, opt):
         self.opt = opt
-        # tokenizer = Tokenizer4Bert(opt.max_seq_len, opt.pretrained_bert_name)
-        # bert = BertModel.from_pretrained(opt.pretrained_bert_name)
-        #
-        # self.model = opt.model_class(bert, opt).to(opt.device)
-
         if 'bert' in opt.model_name:
             # opt.learning_rate = 2e-5
             tokenizer = Tokenizer4Bert(opt.max_seq_len, opt.pretrained_bert_name)
@@ -121,7 +116,7 @@ class Instructor:
                                 os.mkdir('state_dict')
                             path = 'state_dict/{0}_{1}_acc{2}'.format(self.opt.model_name, self.opt.dataset,
                                                                       round(test_acc * 100, 2))
-                            # torch.save(self.model.state_dict(), path)
+                            torch.save(self.model.state_dict(), path)
                             logging.info('>> saved: ' + path)
                         logging.info('max_acc:{}  f1:{}'.format(round(test_acc * 100, 2),round(f1 * 100, 2)))
                     if f1 > max_f1:
@@ -180,6 +175,8 @@ class Instructor:
 
 def single_train(opt):
 
+    if 'glove' in opt.model_name:
+        logger.warning('Caution: The LCF-GLoVe model is not available for Chinese datasets.')
 
     if opt.seed is not None:
         random.seed(opt.seed)
@@ -208,10 +205,24 @@ def single_train(opt):
         'laptop': {
             'train': './datasets/semeval14/Laptops_Train.xml.seg',
             'test': './datasets/semeval14/Laptops_Test_Gold.xml.seg'
-        }
-
+        },
+        'car': {
+            'train': './datasets/Chinese/car/car.train.txt',
+            'test': './datasets/Chinese/car/car.test.txt'
+        },
+        'phone': {
+            'train': './datasets/Chinese/camera/camera.train.txt',
+            'test': './datasets/Chinese/camera/camera.test.txt'
+        },
+        'notebook': {
+            'train': './datasets/Chinese/notebook/notebook.train.txt',
+            'test': './datasets/Chinese/notebook/notebook.test.txt'
+        },
+        'camera': {
+            'train': './datasets/Chinese/phone/phone.train.txt',
+            'test': './datasets/Chinese/phone/phone.test.txt'
+        },
     }
-
     input_colses = {
         'bert_spc': ['text_bert_indices', 'bert_segments_ids'],
         'lcf_glove': ['text_bert_indices', 'bert_segments_ids', 'text_raw_bert_indices', 'aspect_bert_indices'],
@@ -278,8 +289,8 @@ def multi_train(config, n):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', default='experiments_glove.json', type=str)
-    # parser.add_argument('--config', default='experiments.json', type=str)
+    # parser.add_argument('--config', default='experiments_glove.json', type=str)
+    parser.add_argument('--config', default='experiments.json', type=str)
     parser.add_argument('--repeat', default=30, type=int)
     args = parser.parse_args()
     path = args.config

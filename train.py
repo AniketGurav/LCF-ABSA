@@ -47,10 +47,6 @@ class Instructor:
                 dat_fname='{0}_{1}_embedding_matrix.dat'.format(str(opt.embed_dim), opt.dataset))
             self.model = opt.model_class(embedding_matrix, opt).to(opt.device)
 
-        # tokenizer = Tokenizer4Bert(opt.max_seq_len, opt.pretrained_bert_name)
-        # bert = BertModel.from_pretrained(opt.pretrained_bert_name)
-        # self.model = opt.model_class(bert, opt).to(opt.device)
-
         trainset = ABSADataset(opt.dataset_file['train'], tokenizer)
         testset = ABSADataset(opt.dataset_file['test'], tokenizer)
         self.train_data_loader = DataLoader(dataset=trainset, batch_size=opt.batch_size, shuffle=True)
@@ -121,7 +117,7 @@ class Instructor:
                                 os.mkdir('state_dict')
                             path = 'state_dict/{0}_{1}_acc{2}'.format(self.opt.model_name, self.opt.dataset,
                                                                       round(test_acc * 100, 2))
-                            # torch.save(self.model.state_dict(), path)
+                            torch.save(self.model.state_dict(), path)
                             logging.info('>> saved: ' + path)
                         logging.info('max_acc:{}  f1:{}'.format(round(test_acc * 100, 2),round(f1 * 100, 2)))
                     if f1 > max_f1:
@@ -181,10 +177,10 @@ class Instructor:
 def single_train():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_name', default='lcf_glove', type=str)
-    parser.add_argument('--dataset', default='laptop', type=str, help='twitter, restaurant, laptop')
+    parser.add_argument('--model_name', default='lcf_bert', type=str)
+    parser.add_argument('--dataset', default='car', type=str, help='twitter, restaurant, laptop')
     parser.add_argument('--use_single_bert', default=False, type=bool,
-                        help='use the same bert modeling for global context and local context to reduce memory requirement')
+               help='use the same bert modeling for global context and local context to reduce memory requirement')
     parser.add_argument('--optimizer', default='adam', type=str)
     parser.add_argument('--initializer', default='xavier_uniform_', type=str)
     parser.add_argument('--learning_rate', default=0.00001, type=float)
@@ -197,7 +193,7 @@ def single_train():
     parser.add_argument('--embed_dim', default=300, type=int)
     parser.add_argument('--hidden_dim', default=300, type=int)
     parser.add_argument('--bert_dim', default=768, type=int)
-    parser.add_argument('--pretrained_bert_name', default='bert-base-uncased', type=str)
+    parser.add_argument('--pretrained_bert_name', default='bert-base-chinese', type=str)
     parser.add_argument('--max_seq_len', default=80, type=int)
     parser.add_argument('--polarities_dim', default=3, type=int)
     parser.add_argument('--hops', default=3, type=int)
@@ -206,6 +202,10 @@ def single_train():
     parser.add_argument('--local_context_focus', default='cdm', type=str)
     parser.add_argument('--seed', default=2019, type=str)
     opt = parser.parse_args()
+
+    if 'glove' in opt.model_name:
+        logger.warning('Caution: The LCF-GLoVe model is not available for Chinese datasets.')
+
 
     if opt.seed is not None:
         random.seed(opt.seed)
@@ -234,8 +234,23 @@ def single_train():
         'laptop': {
             'train': './datasets/semeval14/Laptops_Train.xml.seg',
             'test': './datasets/semeval14/Laptops_Test_Gold.xml.seg'
-        }
-
+        },
+        'car': {
+            'train': './datasets/Chinese/car/car.train.txt',
+            'test': './datasets/Chinese/car/car.test.txt'
+        },
+        'phone': {
+            'train': './datasets/Chinese/camera/camera.train.txt',
+            'test': './datasets/Chinese/camera/camera.test.txt'
+        },
+        'notebook': {
+            'train': './datasets/Chinese/notebook/notebook.train.txt',
+            'test': './datasets/Chinese/notebook/notebook.test.txt'
+        },
+        'camera': {
+            'train': './datasets/Chinese/phone/phone.train.txt',
+            'test': './datasets/Chinese/phone/phone.test.txt'
+        },
     }
 
     input_colses = {
