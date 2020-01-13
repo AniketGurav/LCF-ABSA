@@ -8,11 +8,13 @@ This is the up-to-date version which transferred pytorch-pretrained-bert to pyto
 
 > Pytorch-transformers.
 
-> Aspect-based Sentiment Analysis (ABSA/ABSC).
+> Aspect-based Sentiment Analysis (GloVe/BERT).
 
 > Chinese Aspect-based Sentiment Analysis
 
-### Multi-task Learning of ABSA
+> 中文方面级情感分析（中文ABSA）
+
+## Multi-task Learning of ABSA
 
 Here is new paper aims at Chinese and multilingual-oriented Aspect Polarity Classification and Aspect Term Extraction:
 [A Multi-task Learning Model for Chinese-oriented Aspect Polarity Classification and Aspect Term Extraction](https://arxiv.org/abs/1912.07976), the codes are available at: [LCF-ATEPC](https://github.com/yangheng95/LCF-ATEPC).
