@@ -1,6 +1,6 @@
 # LCF-ABSA
 
-code for our paper [LCF: A Local Context Focus Mechanism for Aspect-Based Sentiment Classification](https://www.mdpi.com/2076-3417/9/16/3389).
+Codes for our paper [LCF: A Local Context Focus Mechanism for Aspect-Based Sentiment Classification](https://www.mdpi.com/2076-3417/9/16/3389).
 
 This is the up-to-date version which transferred pytorch-pretrained-bert to pytorch-transformers, and an earlier version of LCF-BERT models can be found at [ABSA-PyTorch](https://github.com/songyouwei/ABSA-PyTorch).
 
@@ -50,6 +50,7 @@ python batch_training.py --config experiments_glove.json
  Try to set '*batch_size=8*' or *'use_single_bert = True'* while out-of-memory error occurs.
 
 ## Performance of LCF design models
+We made our efforts to make our research reproducible. However, the performance of the GloVe embedding-based models fluctuates and any slight changes in the model structure could also influence performance. We will try to alleviate this problem in future research. 
 The performance based on the pytorch pre-trained model of bert-base-uncased. 
 ``The results below are the best performance so try to set the different random seed to reproduce the result. (The original has been refactored and migrated from pytroch-pretrained-bert to pytorch-transformer and not all experiments are reproduced under current code version)``
 
