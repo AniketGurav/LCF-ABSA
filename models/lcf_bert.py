@@ -10,7 +10,6 @@ import numpy as np
 
 from pytorch_transformers.modeling_bert import BertPooler, BertSelfAttention
 
-
 class SelfAttention(nn.Module):
     def __init__(self, config, opt):
         super(SelfAttention, self).__init__()
@@ -20,72 +19,56 @@ class SelfAttention(nn.Module):
         self.tanh = torch.nn.Tanh()
 
     def forward(self, inputs):
-        zero_tensor = torch.tensor(np.zeros((inputs.size(0), 1, 1, self.opt.max_seq_len),
-                                            dtype=np.float32), dtype=torch.float32).to(self.opt.device)
+        zero_vec = np.zeros((inputs.size(0), 1, 1, self.opt.max_seq_len))
+        zero_tensor = torch.tensor(zero_vec).float().to(self.opt.device)
         SA_out = self.SA(inputs, zero_tensor)
         return self.tanh(SA_out[0])
 
 class LCF_BERT(nn.Module):
     def __init__(self, bert, opt):
         super(LCF_BERT, self).__init__()
-        self.bert_global_focus = bert
-        self.bert_local_focus = copy.deepcopy(bert) if opt.use_single_bert else bert
+        self.bert4global = bert
+        self.bert4local = copy.deepcopy(bert) if not opt.use_single_bert else self.bert4global
         self.opt = opt
         self.dropout = nn.Dropout(opt.dropout)
         self.bert_SA = SelfAttention(bert.config, opt)
-        self.linear_double_cdm_or_cdw = nn.Linear(opt.bert_dim * 2, opt.bert_dim)
-        self.linear_triple_lcf_global = nn.Linear(opt.bert_dim * 3, opt.bert_dim)
+        self.linear2 = nn.Linear(opt.bert_dim * 2, opt.bert_dim)
+        self.linear3 = nn.Linear(opt.bert_dim * 3, opt.bert_dim)
         self.bert_pooler = BertPooler(bert.config)
         self.dense = nn.Linear(opt.bert_dim, opt.polarities_dim)
 
-    # create the mask tensor for local context features
-    def feature_dynamic_mask(self, text_local_indices, aspect_indices):
-        texts = text_local_indices.cpu().numpy()
-        asps = aspect_indices.cpu().numpy()
-        mask_len = self.opt.SRD
-        masked_text_raw_indices = np.ones((text_local_indices.size(0), self.opt.max_seq_len, self.opt.bert_dim),
-                                          dtype=np.float32)
-        for text_i, asp_i in zip(range(len(texts)), range(len(asps))):
-            asp_len = np.count_nonzero(asps[asp_i]) - 2
-            try:
-                asp_begin = np.argwhere(texts[text_i] == asps[asp_i][1])[0][0]
-            except:
-                continue
-            if asp_begin >= mask_len:
-                mask_begin = asp_begin - mask_len
-            else:
-                mask_begin = 0
-            for i in range(mask_begin):
-                masked_text_raw_indices[text_i][i] = np.zeros((self.opt.bert_dim), dtype=np.float)
-            for j in range(asp_begin + asp_len + mask_len + 1, self.opt.max_seq_len):
-                masked_text_raw_indices[text_i][j] = np.zeros((self.opt.bert_dim), dtype=np.float)
-        masked_text_raw_indices = torch.from_numpy(masked_text_raw_indices)
-        return masked_text_raw_indices.to(self.opt.device)
+    # create the mask matrix for generating local context features
+    def get_mask_matrix(self, input_indices, aspect_indices):
+        texts = input_indices.cpu().numpy()
+        aspects = aspect_indices.cpu().numpy()
+        mask_matrix = np.ones((input_indices.size(0), self.opt.max_seq_len,
+                               self.opt.bert_dim), dtype=np.float32)
+        for text_i, asp_i in zip(range(len(texts)), range(len(aspects))):
+            aspect_len = np.count_nonzero(aspects[asp_i]) - 2
+            aspect_begin = np.argwhere(texts[text_i] == aspects[asp_i][1])[0][0]
+            lcf_begin = aspect_begin - self.opt.SRD if aspect_begin >= self.opt.SRD else 0
+            for i in range(self.opt.max_seq_len):
+                if i < lcf_begin or i > aspect_begin + aspect_len + self.opt.SRD - 1:
+                    mask_matrix[text_i][i] = np.zeros((self.opt.bert_dim), dtype=np.float)
+        return torch.tensor(mask_matrix).to(self.opt.device)
 
-    # create the weights tensor for local context features
-    def feature_dynamic_weighted(self, text_local_indices, aspect_indices):
-        texts = text_local_indices.cpu().numpy()
-        asps = aspect_indices.cpu().numpy()
-        masked_text_raw_indices = np.ones((text_local_indices.size(0), self.opt.max_seq_len, self.opt.bert_dim),
-                                          dtype=np.float32)
-        for text_i, asp_i in zip(range(len(texts)), range(len(asps))):
-            asp_len = np.count_nonzero(asps[asp_i]) - 2
-            try:
-                asp_begin = np.argwhere(texts[text_i] == asps[asp_i][1])[0][0]
-                asp_avg_index = (asp_begin * 2 + asp_len) / 2
-            except:
-                continue
-            distances = np.zeros(np.count_nonzero(texts[text_i]), dtype=np.float32)
-            for i in range(1, np.count_nonzero(texts[text_i])-1):
-                if abs(i - asp_avg_index) + asp_len / 2 > self.opt.SRD:
-                    distances[i] = 1 - (abs(i - asp_avg_index)+asp_len/2
-                                        - self.opt.SRD)/np.count_nonzero(texts[text_i])
-                else:
-                    distances[i] = 1
-            for i in range(len(distances)):
-                masked_text_raw_indices[text_i][i] = masked_text_raw_indices[text_i][i] * distances[i]
-        masked_text_raw_indices = torch.from_numpy(masked_text_raw_indices)
-        return masked_text_raw_indices.to(self.opt.device)
+    # create the weight matrix for generating local context features
+    def get_weight_matrix(self, input_indices, aspect_indices):
+        texts = input_indices.cpu().numpy()
+        aspects = aspect_indices.cpu().numpy()
+        weight_matrix = np.zeros((input_indices.size(0), self.opt.max_seq_len,
+                                  self.opt.bert_dim), dtype=np.float32)
+        for text_i, asp_i in zip(range(len(texts)), range(len(aspects))):
+            aspect_len = np.count_nonzero(aspects[asp_i]) - 2
+            aspect_begin = np.argwhere(texts[text_i] == aspects[asp_i][1])[0][0]
+            aspect_central_index = (aspect_begin * 2 + aspect_len) / 2
+            weight_for_each_text = np.zeros(np.count_nonzero(texts[text_i]), dtype=np.float32)
+            for i in range(np.count_nonzero(texts[text_i])):
+                weight_for_each_text[i] = 1 - (abs(i - aspect_central_index) + aspect_len / 2 - self.opt.SRD) /\
+                np.count_nonzero(texts[text_i]) if abs(i - aspect_central_index) + aspect_len / 2 > self.opt.SRD else 1
+                weight_matrix[text_i][i] = weight_for_each_text[i] * np.ones((self.opt.bert_dim))
+
+        return torch.tensor(weight_matrix).to(self.opt.device)
 
     def forward(self, inputs):
         text_bert_indices = inputs[0]
@@ -93,31 +76,32 @@ class LCF_BERT(nn.Module):
         text_local_indices = inputs[2]
         aspect_indices = inputs[3]
 
-        bert_global_out, _ = self.bert_global_focus(text_bert_indices, bert_segments_ids)
-        bert_local_out, _ = self.bert_local_focus(text_local_indices)
+        global_context_features, _ = self.bert4global(text_bert_indices, bert_segments_ids)
+        local_context_features, _ = self.bert4local(text_local_indices)
 
         if self.opt.local_context_focus == 'cdm':
-            masked_local_text_vec = self.feature_dynamic_mask(text_local_indices, aspect_indices)
-            bert_local_out = torch.mul(bert_local_out, masked_local_text_vec)
-            out_cat = torch.cat((bert_local_out, bert_global_out), dim=-1)
-            out_cat = self.linear_double_cdm_or_cdw(out_cat)
+            mask_matrix = self.get_mask_matrix(text_local_indices, aspect_indices)
+            cdm_features = torch.mul(local_context_features, mask_matrix)
+            cdm_features = self.bert_SA(cdm_features)
+            cat_features = torch.cat((cdm_features, global_context_features), dim=-1)
+            cat_features = self.linear2(cat_features)
 
         elif self.opt.local_context_focus == 'cdw':
-            weighted_text_local_features = self.feature_dynamic_weighted(text_local_indices, aspect_indices)
-            bert_local_out = torch.mul(bert_local_out, weighted_text_local_features)
-            out_cat = torch.cat((bert_local_out, bert_global_out), dim=-1)
-            out_cat = self.linear_double_cdm_or_cdw(out_cat)
+            weight_matrix = self.get_weight_matrix(text_local_indices, aspect_indices)
+            cdw_features = torch.mul(local_context_features, weight_matrix)
+            cdw_features = self.bert_SA(cdw_features)
+            cat_features = torch.cat((cdw_features, global_context_features), dim=-1)
+            cat_features = self.linear2(cat_features)
 
         elif self.opt.local_context_focus == 'lcf_fusion':
-            masked_local_text_vec = self.feature_dynamic_mask(text_local_indices, aspect_indices)
-            bert_masked_local_out = torch.mul(bert_local_out, masked_local_text_vec)
-            weighted_text_local_features = self.feature_dynamic_weighted(text_local_indices, aspect_indices)
-            bert_weighted_local_out = torch.mul(bert_local_out, weighted_text_local_features)
-            out_cat = torch.cat((bert_masked_local_out, bert_global_out, bert_weighted_local_out), dim=-1)
-            out_cat = self.linear_triple_lcf_global(out_cat)
+            mask_matrix = self.get_mask_matrix(text_local_indices, aspect_indices)
+            cdm_features = torch.mul(local_context_features, mask_matrix)
+            weight_matrix = self.get_weight_matrix(text_local_indices, aspect_indices)
+            cdw_features = torch.mul(local_context_features, weight_matrix)
+            cat_features = torch.cat((cdm_features, global_context_features, cdw_features), dim=-1)
+            cat_features = self.linear3(cat_features)
 
-        self_attention_out = self.bert_SA(out_cat)
-        self_attention_out = self.dropout(self_attention_out)
-        pooled_out = self.bert_pooler(self_attention_out)
+        cat_features = self.dropout(cat_features)
+        pooled_out = self.bert_pooler(cat_features)
         dense_out = self.dense(pooled_out)
         return dense_out

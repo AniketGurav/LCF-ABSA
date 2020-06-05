@@ -24,7 +24,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 
-
 class Instructor:
     def __init__(self, opt):
         self.opt = opt
@@ -176,7 +175,8 @@ class Instructor:
 def single_train(opt):
 
     if 'glove' in opt.model_name:
-        logger.warning('Caution: The LCF-GLoVe model is not available for Chinese datasets.')
+        logger.warning('Notice: The LCF-GLoVe model is not available for Chinese '
+                       'datasets unless applying suitable Chinese embedding.')
 
     if opt.seed is not None:
         random.seed(opt.seed)
@@ -189,8 +189,7 @@ def single_train(opt):
     model_classes = {
         'bert_spc': BERT_SPC,
         'lcf_glove': LCF_GLOVE,
-        'lcf_bert': LCF_BERT,
-        'lca_net': LCF_BERT,
+        'lcf_bert': LCF_BERT
     }
 
     dataset_files = {
@@ -225,9 +224,8 @@ def single_train(opt):
     }
     input_colses = {
         'bert_spc': ['text_bert_indices', 'bert_segments_ids'],
-        'lcf_glove': ['text_bert_indices', 'bert_segments_ids', 'text_raw_bert_indices', 'aspect_bert_indices'],
-        'lcf_bert': ['text_bert_indices', 'bert_segments_ids', 'text_raw_bert_indices', 'aspect_bert_indices'],
-        'lca_net': ['text_bert_indices', 'bert_segments_ids', 'text_raw_bert_indices', 'aspect_bert_indices'],
+        'lcf_glove': ['text_bert_indices', 'text_raw_bert_indices', 'aspect_bert_indices'],
+        'lcf_bert': ['text_bert_indices', 'bert_segments_ids', 'text_raw_bert_indices', 'aspect_bert_indices']
     }
     initializers = {
         'xavier_uniform_': torch.nn.init.xavier_uniform_,
